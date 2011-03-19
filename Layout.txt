@@ -1,0 +1,138 @@
+Creating layouts
+
+Please note that this guide is just a short reference. Most entries 
+are used in the default layout. Refer to the file "Default.lua" to see
+actual usage. Please do not edit the "Default.lua" file, as your layout
+then will be overwritten the next time you update MessageBoard.
+
+1. Basics
+
+The layout-functionality of MessageBoard is usable in two ways. It can 
+be set directly by writing a new file and include that in the add-on 
+loader-list (after Default.lua), or it can be set in memory by another
+add-on. The latter being useful by for example UI designers who wants
+MessageBoard to fit better with their own UI.
+An easy way of doing this is to have your add-on wait until the table 
+"MessageBoardXML.Layout" exists. Then you can insert a table in it with 
+the name of your layout containing the data. Do not create this in 
+your add-on, as MessageBoard will empty it when it loads.
+
+A layout is defined as a LUA table that may contain from a single
+element up to all elements available in MessageBoard. It uses standard 
+WoW LUA and XML standards. This is the definition of the title text in 
+the deafult layout:
+	Title={
+		Width=451,
+		Height=17,
+		Anchor1={ Point="TOPLEFT", Relative="TOPLEFT", X=14, Y=-7 },
+		FontObject="GameFontHighlight",
+		JustifyH="LEFT",
+		JustifyV="MIDDLE",
+	},
+Text-elements also supports colour and font settings.
+
+2. Inherit
+A new layout can base its entire layout on another layout. This is 
+done by specifying its name in "Inherit". From there, your own layout 
+only needs to contain changes from the one you are inheriting from.
+
+For example, if you want to use the default layout but change the title
+to center-aligned text, this would be your entire layout-definition:
+	MessageBoardXML.Layout["My centered title"]={
+		Inherit="Default",			-- Inherits all settings from the layout "Default"
+		Main={						-- The main window
+			Title={					-- Its title
+				JustifyH="CENTER",	-- Horisontal alignment
+			},
+		},
+	}
+
+3. Elements
+
+Elements are divided into types. The available types are main window, 
+size, text, lists, and textures.
+
+3.1 Main window
+The main window will contain all your elements (see the "Default.lua" 
+file). Width, height, and backdrop can be specified. This is the 
+definition for the default window:
+	Main={
+		Width=491,
+		Height=491,
+		Backdrop={
+			File="Interface\\AddOns\\MessageBoard\\Images\\MessageBoardBG",
+			Tile=false,
+			TileSize=0,
+			EdgeFile="",
+			EdgeSize=0,
+			Insets={ Left=0, Right=-21, Top=0, Bottom=-21 },
+		},
+	},
+The above Backdrop entry follows the WoW LUA frame:SetBackdrop function 
+as specified here: http://www.wowwiki.com/API_Frame_SetBackdrop
+
+3.2 Size
+A size contains physical size, position and anchors.
+	Element={
+		Width=100,
+		Height=15,
+		Anchor1={ Point="TOPLEFT", Relative="TOPLEFT", X=14, Y=-7 },
+	},
+Several anchors can be set by specifying "Anchor1", "Anchor2", etc.
+If you do not want to anchor to the parent frame, you must know the 
+name of the frame you want to anchor to, and specify that as "ToFrame" 
+in the anchor.
+
+3.3 Text
+This element contains normal text, where the look of the text can be 
+specified. Like the title-bar and list of topics/authors, etc.
+	Element={
+		Font={ File="file-name", Size=14, Flags="OUTLINE, THICKOUTLINE ,MONOCHROME" },
+		FontObject="GameFontNormal",
+		JustifyH="LEFT",
+		JustifyV="TOP",
+		Color={ r=1, g=1, b=1, a=1 },
+	},
+"Font" and "FontObject are mutually exclusive, and "Font" will be 
+chosen if both are specified.
+
+3.4 List
+A list is specifically the list of topics and the list of messages in 
+a topic, the left and right lists in the default layout, respectively.
+The topics as per default layout:
+	TopicScroller={
+		Entries=5,
+		Width=245,
+		Anchor1={ Point="TOPLEFT", X=11, Y=-125 },
+		Text={
+			FontObject="GameFontNormal",
+			JustifyH="LEFT",
+			JustifyV="MIDDLE",
+		},
+	},
+A list contains both elements "size" and "text" with the exception of 
+the parameter "Height". This has been changed to "Entries" which 
+denote how many entries the list will contain, and thus the height 
+will be calculated from that.
+
+3.5 Texture
+Any number of textures can be added to create a specific graphic layout 
+by adding images to the main window. These must be named "Texture1", 
+"Texture2", etc.
+	Texture1={
+		Image="Interface\\AddOns\\MessageBoard\\Images\\MessageBoard_Options",
+		Layer="ARTWORK",
+		Anchor1={ Point="TOPLEFT", X=0, Y=0 },
+		Width=100,
+		Height=100,
+	},
+In addition to image-specific parameters (Image and Layer), a texture 
+also supports the "size" element. The "Image" parameter can be any 
+image readable by WoW.
+
+NOTE: If you end up with a green square in stead of your image, do the 
+following:
+1. Check for spelling mistakes.
+2. Shut down WoW and restart it. This is often required as WoW needs 
+to know about your image-file when it starts. Images added to the 
+directory-structure after WoW was started will not be readable.

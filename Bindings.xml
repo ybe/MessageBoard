@@ -1,0 +1,9 @@
+<Bindings>
+	<Binding name="TOGGLEMESSAGEBOARD" header="MESSAGEBOARD">
+		if (MessageBoard_Main:IsVisible() ) then
+			MessageBoard_Main:Hide();
+		else
+			MessageBoard_Main:Show();
+		end
+	</Binding>
+</Bindings>

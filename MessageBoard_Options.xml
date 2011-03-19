@@ -1,0 +1,430 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	<Script file="MessageBoard_Options.lua"/>
+	<Button name="MessageBoard_AvatarTemplate" virtual="true">
+		<Size><AbsDimension x="36" y="36"/></Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Buttons\UI-EmptySlot-Disabled">
+					<Size><AbsDimension x="64" y="64"/></Size>
+					<Anchors><Anchor point="CENTER"><Offset><AbsDimension x="0" y="-1"/></Offset></Anchor></Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture name="$parentIcon">
+			<Size><AbsDimension x="36" y="36"/></Size>
+			<Anchors><Anchor point="CENTER"><Offset><AbsDimension x="0" y="-1"/></Offset></Anchor></Anchors>
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+		<Scripts><OnClick>MessageBoardXML:SelectIcon();</OnClick></Scripts>
+	</Button>
+	<EditBox name="MessageBoard_EditTemplate" enableMouse="true" autoFocus="false" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+					<Size><AbsDimension x="8" y="20" /></Size>
+					<Anchors><Anchor point="LEFT"/></Anchors>
+					<TexCoords left="0" right="0.0625" top="0" bottom="0.625" />
+				</Texture>
+				<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+					<Size><AbsDimension x="8" y="20"/></Size>
+					<Anchors><Anchor point="RIGHT"/></Anchors>
+					<TexCoords left="0.9375" right="1" top="0" bottom="0.625" />
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+					<Size><AbsDimension x="10" y="20"/></Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT" />
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625" />
+				</Texture>
+			</Layer>
+		</Layers>
+		<FontString inherits="GameFontNormal" justifyH="LEFT"/>
+		<Scripts>
+			<OnLoad>this:SetTextInsets(3,2,0,0);</OnLoad>
+			<OnEscapePressed>this:ClearFocus();</OnEscapePressed>
+		</Scripts>
+	</EditBox>
+
+	<Frame name="MessageBoard_OFrame" frameStrata="HIGH" toplevel="true" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size><AbsDimension x="376" y="332"/></Size>
+		<Anchors><Anchor point="CENTER"/></Anchors>
+
+		<TitleRegion setAllPoints="true"/>
+		<Frames>
+			<!-- The window closer -->
+			<Button name="$parent_CloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOPRIGHT"><Offset><AbsDimension x="-11" y="-11"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>this:GetParent():Hide();</OnClick>
+				</Scripts>
+			</Button>
+			<!-- User avatar -->
+			<Button name="$parent_OpenAvatar" inherits="UIPanelButtonTemplate2" text="Avatar">
+				<Size><AbsDimension x="90" y="24"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="5" y="5"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>MessageBoardXML:ShowAvatarWindow();</OnClick>
+					<OnLoad>this.Help=MessageBoardLANG.Help.SelectAvatar;this:SetText(MessageBoardLANG.Widget.Avatar);</OnLoad>
+					<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>
+			</Button>
+			<!-- Layout -->
+			<Button name="$parent_OpenLayout" inherits="UIPanelButtonTemplate2" text="Layout">
+				<Size><AbsDimension x="90" y="24"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="96" y="5"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>MessageBoardXML:ShowLayoutWindow();</OnClick>
+				</Scripts>
+			</Button>
+			<!-- Users -->
+			<Button name="$parent_OpenAdminUser" inherits="UIPanelButtonTemplate2" text="Users" hidden="true">
+				<Size><AbsDimension x="90" y="24"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="187" y="5"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>MessageBoardXML.Admin:ShowUsersWindow();</OnClick>
+				</Scripts>
+			</Button>
+			<!-- Open purge-window -->
+			<Button name="$parent_OpenAdminPurge" inherits="UIPanelButtonTemplate2" text="DB">
+				<Size><AbsDimension x="90" y="24"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="278" y="5"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>MessageBoardXML.Admin:ShowPurgeWindow();</OnClick>
+					<OnLoad>this.Help=MessageBoardLANG.Help.PruneDatabase;this:SetText(MessageBoardLANG.Widget.PruneDB);</OnLoad>
+					<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>
+			</Button>
+			<!-- Avatar window -->
+			<Frame name="$parent_Avatar" hidden="true">
+				<Anchors><Anchor point="TOPLEFT"/><Anchor point="BOTTOMRIGHT"/></Anchors>
+				<Frames>
+					<!-- The slider -->
+					<Slider name="$parentSlider" defaultValue="0" minValue="0" maxValue="0" orientation="VERTICAL" enableMouse="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"><Offset><AbsDimension x="9" y="-62"/></Offset></Anchor>
+						</Anchors>
+						<Size><AbsDimension x="12" y="167"/></Size>
+						<HitRectInsets><AbsInset left="0" right="0" top="-10" bottom="-10"/></HitRectInsets>
+						<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+							<EdgeSize><AbsValue val="8"/></EdgeSize>
+							<TileSize><AbsValue val="8"/></TileSize>
+							<BackgroundInsets><AbsInset left="3" right="3" top="6" bottom="6"/></BackgroundInsets>
+						</Backdrop>
+						<ThumbTexture file="Interface\Buttons\UI-SliderBar-Button-Vertical"><Size><AbsDimension x="27" y="32"/></Size></ThumbTexture>
+						<Scripts>
+							<OnLoad>this:SetValueStep(7);</OnLoad>
+							<OnValueChanged>MessageBoardXML:ListAvailableAvatars();</OnValueChanged>
+							<OnClick>MessageBoardXML:ListAvailableAvatars();</OnClick>
+						</Scripts>
+					</Slider>
+					<!-- Images -->
+					<Button name="$parentSel_1" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOPLEFT" relativeTo="$parentSlider" relativePoint="TOPRIGHT"><Offset><AbsDimension x="18" y="-15"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_2" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="LEFT" relativeTo="$parentSel_1" relativePoint="RIGHT"><Offset><AbsDimension x="9"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_3" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="LEFT" relativeTo="$parentSel_2" relativePoint="RIGHT"><Offset><AbsDimension x="9"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_4" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="LEFT" relativeTo="$parentSel_3" relativePoint="RIGHT"><Offset><AbsDimension x="9"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_5" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="LEFT" relativeTo="$parentSel_4" relativePoint="RIGHT"><Offset><AbsDimension x="9"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_6" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="LEFT" relativeTo="$parentSel_5" relativePoint="RIGHT"><Offset><AbsDimension x="9"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_7" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="LEFT" relativeTo="$parentSel_6" relativePoint="RIGHT"><Offset><AbsDimension x="9"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_8" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_1" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_9" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_2" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_10" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_3" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_11" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_4" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_12" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_5" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_13" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_6" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_14" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_7" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_15" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_8" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_16" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_9" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_17" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_10" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_18" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_11" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_19" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_12" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_20" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_13" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Button name="$parentSel_21" inherits="MessageBoard_AvatarTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parentSel_14" relativePoint="BOTTOM"><Offset><AbsDimension y="-11"/></Offset></Anchor></Anchors>
+					</Button>
+					<Frame name="$parent_HiddenScroller">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSlider" relativePoint="TOPLEFT"/>
+							<Anchor point="BOTTOM" relativeTo="$parentSlider" relativePoint="BOTTOM"/>
+							<Anchor point="RIGHT" relativeTo="$parentSel_21" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts><OnMouseWheel>MessageBoardXML:MouseWheel(MessageBoard_OFrame_AvatarSlider);</OnMouseWheel></Scripts>
+					</Frame>
+					<!-- Selected icon -->
+					<Button name="$parentSel_Current" inherits="MessageBoard_AvatarTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT"><Offset><AbsDimension x="-18" y="60"/></Offset></Anchor>
+						</Anchors>
+						<Scripts><OnClick></OnClick></Scripts>
+					</Button>
+					<!-- Clear icon -->
+					<Button name="$parent_ClearIcon" inherits="UIPanelButtonTemplate2" text="Clear">
+						<Size><AbsDimension x="100" y="26"/></Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentSel_Current" relativePoint="LEFT"><Offset><AbsDimension x="-14"/></Offset></Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>MessageBoard_OFrame_AvatarSel_CurrentIcon:SetTexture("");</OnClick>
+							<OnLoad>this.Help=MessageBoardLANG.Help.ClearAvatar;this:SetText(MessageBoardLANG.Widget.Clear);</OnLoad>
+							<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+							<OnLeave>GameTooltip:Hide();</OnLeave>
+						</Scripts>
+					</Button>
+					<!-- Save options -->
+					<Button name="$parent_Save" inherits="UIPanelButtonTemplate2" text="Save">
+						<Size><AbsDimension x="100" y="26"/></Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="14" y="58"/></Offset></Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>MessageBoardXML:SaveAvatar();</OnClick>
+							<OnLoad>this.Help=MessageBoardLANG.Help.SaveAvatar;this:SetText(MessageBoardLANG.Widget.Save);</OnLoad>
+							<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+							<OnLeave>GameTooltip:Hide();</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentTitle" inherits="GameFontHighlight" text="Select your avatar/icon">
+							<Anchors><Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"><Offset><AbsDimension x="15" y="-11"/></Offset></Anchor></Anchors>
+						</FontString>
+						<FontString name="$parentAvatarListTitle" inherits="GameFontHighlight" text="Available icons">
+							<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-39" /></Offset></Anchor></Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<!-- Select layout window -->
+			<Frame name="$parent_Layout" hidden="true">
+				<Anchors><Anchor point="TOPLEFT"/><Anchor point="BOTTOMRIGHT"/></Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentTitle" inherits="GameFontHighlight" text="Select your layout">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"><Offset><AbsDimension x="15" y="-11"/></Offset></Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontHighlight" text="Layouts">
+							<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-39" /></Offset></Anchor></Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<!-- Layout-list -->
+					<Frame name="$parent_List">
+						<Size><AbsDimension x="214" y="109"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"><Offset><AbsDimension x="9" y="-62" /></Offset></Anchor>
+						</Anchors>
+						<Frames>
+							<Slider name="$parent_Scroll" inherits="MessageBoard_SliderTemplate">
+								<Size><AbsDimension x="10" /></Size>
+								<Anchors>
+									<Anchor point="TOPLEFT"></Anchor>
+									<Anchor point="BOTTOMLEFT"></Anchor>
+								</Anchors>
+								<Scripts>
+									<OnValueChanged>MessageBoardXML:ScrollLayouts();</OnValueChanged>
+									<OnClick>MessageBoardXML:SelectLayout();</OnClick>
+								</Scripts>
+							</Slider>
+							<!-- Author handlers -->
+							<CheckButton name="$parent_Entry1" inherits="MessageBoard_SelectorButtonTemplate" text="Author 1">
+								<Anchors>
+									<Anchor point="TOPLEFT"><Offset><AbsDimension x="19" /></Offset></Anchor>
+									<Anchor point="RIGHT" />
+								</Anchors>
+							</CheckButton>
+						</Frames>
+						<Scripts>
+							<OnLoad>this.Entries=1;</OnLoad>
+							<OnMouseWheel>MessageBoardXML:MouseWheel(_G[this:GetName().."_Scroll"]);</OnMouseWheel>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<!-- Database purge-window -->
+			<Frame name="$parent_Purge" hidden="true">
+				<Anchors><Anchor point="TOPLEFT"/><Anchor point="BOTTOMRIGHT"/></Anchors>
+				<Frames>
+					<!-- Memory usage -->
+					<CheckButton name="$parent_ByMemory" inherits="UICheckButtonTemplate">
+						<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="34" y="-62"/></Offset></Anchor></Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Memory usage" justifyH="LEFT" justifyV="MIDDLE">
+									<Size><AbsDimension x="172" y="32"/></Size>
+									<Anchors><Anchor point="LEFT" relativePoint="RIGHT"/></Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</CheckButton>
+					<EditBox name="$parent_ByMemoryValue" inherits="MessageBoard_EditTemplate">
+						<Size><AbsDimension x="60" y="22" /></Size>
+						<Anchors><Anchor point="LEFT" relativeTo="$parent_ByMemory" relativePoint="RIGHT"><Offset><AbsDimension x="178"/></Offset></Anchor></Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="MB" justifyH="LEFT" justifyV="MIDDLE">
+									<Size><AbsDimension x="172" y="32"/></Size>
+									<Anchors><Anchor point="LEFT" relativePoint="RIGHT"><Offset><AbsDimension x="5"/></Offset></Anchor></Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</EditBox>
+					<!-- Message limit -->
+					<CheckButton name="$parent_ByMessages" inherits="UICheckButtonTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_ByMemory" relativePoint="BOTTOM"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor></Anchors>
+						<Scripts>
+							<OnLoad>this.Help=MessageBoardLANG.Help.MessageLimit;
+									_G[this:GetName().."Text"]:SetText(MessageBoardLANG.Widget.MessageLimit);</OnLoad>
+							<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+							<OnLeave>GameTooltip:Hide();</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<EditBox name="$parent_ByMessagesValue" inherits="MessageBoard_EditTemplate">
+						<Size><AbsDimension x="60" y="22" /></Size>
+						<Anchors><Anchor point="LEFT" relativeTo="$parent_ByMessages" relativePoint="RIGHT"><Offset><AbsDimension x="178"/></Offset></Anchor></Anchors>
+					</EditBox>
+					<!-- Regular -->
+					<CheckButton name="$parent_RegularFirst" inherits="UICheckButtonTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_ByMessages" relativePoint="BOTTOM"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor></Anchors>
+						<Scripts>
+							<OnLoad>this.Help=MessageBoardLANG.Help.RegularFirst;
+									_G[this:GetName().."Text"]:SetText(MessageBoardLANG.Widget.RegularFirst);</OnLoad>
+							<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+							<OnLeave>GameTooltip:Hide();</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<!-- Sticky -->
+					<CheckButton name="$parent_StickyFirst" inherits="UICheckButtonTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_RegularFirst" relativePoint="BOTTOM"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor></Anchors>
+						<Scripts>
+							<OnLoad>this.Help=MessageBoardLANG.Help.StickyFirst;
+									_G[this:GetName().."Text"]:SetText(MessageBoardLANG.Widget.StickyFirst);</OnLoad>
+							<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+							<OnLeave>GameTooltip:Hide();</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<!-- Save options -->
+					<Button name="$parent_Save" inherits="UIPanelButtonTemplate2" text="Save">
+						<Size><AbsDimension x="100" y="26"/></Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="14" y="58"/></Offset></Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>MessageBoardXML.Admin:SavePurge();</OnClick>
+							<OnLoad>this.Help=MessageBoardLANG.Help.SavePruneOptions;this:SetText(MessageBoardLANG.Widget.Save);</OnLoad>
+							<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+							<OnLeave>GameTooltip:Hide();</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentTitle" inherits="GameFontHighlight" text="Administrator console: Database">
+							<Anchors><Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"><Offset><AbsDimension x="15" y="-11"/></Offset></Anchor></Anchors>
+						</FontString>
+						<FontString name="$parentMemMsg" inherits="GameFontHighlight" text="- usage -" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="TOPRIGHT"><Offset><AbsDimension x="-25" y="-11"/></Offset></Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentSubTitle" inherits="GameFontHighlight" text="Database delete-rules">
+							<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-39" /></Offset></Anchor></Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<!-- User administration -->
+			<Frame name="$parent_Users" hidden="true">
+				<Anchors><Anchor point="TOPLEFT"/><Anchor point="BOTTOMRIGHT"/></Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentTitle" inherits="GameFontHighlight" text="Administrator console: Users">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"><Offset><AbsDimension x="15" y="-11"/></Offset></Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontHighlight" text="- Text is coming here -">
+							<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-39" /></Offset></Anchor></Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\AddOns\MessageBoard\Images\MessageBoard_Options">
+					<Size><AbsDimension x="512" y="512"/></Size>
+					<Anchors><Anchor point="TOPLEFT"/></Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnShow>
+			</OnShow>
+			<OnHide>
+			</OnHide>
+			<OnLoad>
+			</OnLoad>
+			<OnEvent>
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

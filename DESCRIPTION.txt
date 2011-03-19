@@ -1,0 +1,53 @@
+
+MessageBoard
+It's a guild-wide message-board. That means it is a forum, like you know
+from web-based discussion-sites. The difference is that this is a 100%
+in-game WoW addon. It does not need a web-server, or a server-character
+that is always logged in, or external software, or anything special.
+
+It is no secret that it's often difficult to get guildies to log in to the
+web-site to check messages. It's usually only the "hardcore" people that
+bother on a regular basis.
+This addon will help you. It requires no technical skills at all, beyond
+the ability to use a simple forum. Just install and play.
+
+NOTE: This is an alpha+ version. Please read the text on "version" at the
+end.
+
+Requirements
+You need to:
+- install the addon
+- be a member of a guild
+(easy, eh?)
+
+Usage
+- To open MessageBoard, press the minimap icon.
+- Hover the mouse over the minimap icon for positioning-help.
+
+Features
+- Supports announcements, sticky topics and normal topics.
+- Users can set an avatar.
+- Administrators can be assigned by officer's note.
+- The text-editor supports inserting item-links by dropping an item at the
+cursor.
+- The database size is regulated by automatic pruning, by means of
+message-count.
+
+Please note
+It is easy to forget that you are not using a regular forum, but it's all
+within the limits of the WoW game. This means that when you log in, you
+must allow MessageBoard 2 to 3 minutes to update data. The time will vary
+dependent on several factors. But the more messages, the slower it updates.
+To not bore you with technicalities, suffice to say that it is because you
+are not using a real web-server and slow systems must get a chance too.
+The addons talk to eachother, so the more people in the guild that have the
+addon, the better.
+
+Administrators
+An admin is needed to set MessageBoard options, like message-limit for
+database pruning (auto-removal of old posts) and to set the main-page
+Administrator Message. The admin can also edit and delete any post.
+An admin is assigned by typing "#MB:A" (without quotes) in the officer's
+note in the WoW guild-roster. He or she will also need access to read the
+officer's note (in the WoW guild-roster rank settings) for the addon to be
+able to read it. Write-permission is not needed.

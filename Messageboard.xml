@@ -1,0 +1,429 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Script file="MessageBoard.lua"/>
+	<Button name="MessageBoard_LinkTemplate" inherits="ItemButtonTemplate" virtual="true">
+		<Size><AbsDimension x="17" y="17"/></Size>
+		<NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-Quickslot2">
+			<Size><AbsDimension x="29" y="29"/></Size>
+			<Anchors><Anchor point="CENTER"><Offset><AbsDimension x="0" y="-1"/></Offset></Anchor></Anchors>
+		</NormalTexture>
+	</Button>
+	<Slider name="MessageBoard_SliderTemplate" drawLayer="ARTWORK" minValue="0" maxValue="0" defaultValue="0" valueStep="1" virtual="true">
+		<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+			<BackgroundInsets><AbsInset left="3" right="3" top="6" bottom="6" /></BackgroundInsets>
+			<TileSize><AbsValue val="8"/></TileSize>
+			<EdgeSize><AbsValue val="8"/></EdgeSize>
+		</Backdrop>
+		<HitRectInsets><AbsInset left="0" right="0" top="-10" bottom="-10"/></HitRectInsets>
+		<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Vertical">
+			<Size><AbsDimension x="32" y="32"/></Size>
+		</ThumbTexture>
+		<Scripts>
+			<OnLoad>this:SetValueStep(1);</OnLoad>
+			<OnValueChanged>MessageBoardXML:Update();</OnValueChanged>
+			<OnClick>MessageBoardXML:Update();</OnClick>
+		</Scripts>
+	</Slider>
+	<CheckButton name="MessageBoard_SelectorButtonTemplate" virtual="true">
+		<Size><AbsDimension y="17"/></Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIconTexture">
+					<Size><AbsDimension x="17" y="17"/></Size>
+					<Anchors><Anchor point="LEFT"/></Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="19"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<NormalTexture file=""/>
+		<PushedTexture file="Interface\Buttons\UI-Listbox-Highlight2"/>
+		<CheckedTexture file="Interface\Buttons\UI-Listbox-Highlight2" alphaMode="ADD"/>
+		<HighlightTexture file="Interface\Buttons\UI-Listbox-Highlight" alphaMode="ADD"/>
+		<DisabledTexture file=""/>
+		<NormalFont inherits="GameFontHighlight" justifyH="LEFT"/>
+		<HighlightFont inherits="GameFontHighlight" justifyH="LEFT"/>
+		<DisabledFont inherits="GameFontDisable" justifyH="LEFT"/>
+		<Scripts>
+			<OnLoad>
+				this.SetText=MessageBoardXML.SetButtonText;
+				this.GetText=MessageBoardXML.GetButtonText;
+				this.SetTextColor=MessageBoardXML.SetButtonTextColor;
+			</OnLoad>
+			<OnClick>MessageBoardXML:SelectorClicked();</OnClick>
+		</Scripts>
+	</CheckButton>
+	<CheckButton name="MessageBoard_TopicSelectorButtonTemplate" inherits="MessageBoard_SelectorButtonTemplate" virtual="true">
+		<Frames>
+			<Button name="$parentL" inherits="UIPanelButtonTemplate2" text="L">
+				<Size><AbsDimension x="23" y="17"/></Size>
+				<Anchors><Anchor point="LEFT" relativePoint="RIGHT"><Offset><AbsDimension x="3"/></Offset></Anchor></Anchors>
+			</Button>
+			<Button name="$parentD" inherits="UIPanelButtonTemplate2" text="D">
+				<Size><AbsDimension x="23" y="17"/></Size>
+				<Anchors><Anchor point="LEFT" relativePoint="RIGHT"><Offset><AbsDimension x="29"/></Offset></Anchor></Anchors>
+			</Button>
+		</Frames>
+	</CheckButton>
+	<Frame name="MessageBoard_TextureTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parent_Image">
+					<Size><AbsDimension x="132" y="132"/></Size>
+					<Anchors><Anchor point="TOPLEFT"/><Anchor point="BOTTOMRIGHT"/></Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<!--  Minimap Icon  -->
+	<Frame name="MessageBoard_MinimapIcon" enableMouse="true" frameStrata="LOW" parent="Minimap">	
+		<Size><AbsDimension x="32" y="32"/></Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="Minimap" relativePoint="RIGHT"><Offset><AbsDimension x="2" y="0"/></Offset></Anchor>
+		</Anchors>
+		<Frames>
+			<Button name="MessageBoardIcon">
+				<Size><AbsDimension x="32" y="32"/></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BORDER">
+						<Texture name="$parentIcon" file="Interface\Buttons\UI-GuildButton-PublicNote-Up">
+							<Size><AbsDimension x="20" y="20"/>	</Size>
+							<Anchors>
+								<Anchor point="CENTER"><Offset><AbsDimension x="0" y="2"/></Offset></Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture name="$parentBorder" file="Interface\Minimap\MiniMap-TrackingBorder">
+							<Size><AbsDimension x="52" y="52"/></Size>
+							<Anchors><Anchor point="TOPLEFT"/></Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+				<Scripts>
+					<OnLoad>this:RegisterForDrag("RightButton");this.dragme=false;</OnLoad>
+					<OnDragStart>this.dragme=true;</OnDragStart> 
+					<OnDragStop>this.dragme=false;</OnDragStop>
+					<OnUpdate>if(this.dragme==true) then MessageBoardXML:BeingDragged(); end </OnUpdate>
+					<OnClick>MessageBoardXML:Icon_OnClick();</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+						GameTooltip:SetText("MessageBoard");
+						GameTooltipTextLeft1:SetTextColor(1,1,1);
+						GameTooltip:AddLine("Left-click to open MessageBoard");
+						GameTooltip:AddLine("Right-click and drag to move button");
+						GameTooltip:AddLine("Shift-right-click and drag for free-move");
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+			</OnLoad>
+			<OnEvent>
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MessageBoard_Main" frameStrata="HIGH" toplevel="true" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size><AbsDimension x="491" y="491"/></Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor>
+		</Anchors>
+		<TitleRegion setAllPoints="true"/>
+		<Backdrop bgFile="Interface\AddOns\MessageBoard\Images\MessageBoardBG">
+			<BackgroundInsets><AbsInset left="0" right="-21" top="0" bottom="-21"/></BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentTitle" inherits="GameFontHighlight" text="MessageBoard" justifyH="LEFT">
+					<Size><AbsDimension x="451" y="17" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"><Offset><AbsDimension x="14" y="-7" /></Offset></Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentStats" inherits="GameFontHighlightSmall" justifyH="LEFT" text="Stats">
+					<Anchors>
+						<Anchor point="TOPLEFT"><Offset><AbsDimension x="11" y="-35" /></Offset></Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentManagement" inherits="GameFontHighlight" text="Greetings">
+					<Size><AbsDimension y="41" /></Size>
+					<Anchors>
+						<Anchor point="TOP"><Offset><AbsDimension y="-35" /></Offset></Anchor>
+						<Anchor point="LEFT" relativeTo="$parentStats" relativepoint="RIGHT"/>
+						<Anchor point="RIGHT"><Offset><AbsDimension x="-11" /></Offset></Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTopics" inherits="GameFontHighlight" text="Topics" justifyH="LEFT">
+					<Size><AbsDimension x="117" y="17" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"><Offset><AbsDimension x="14" y="-95" /></Offset></Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentContents" inherits="GameFontHighlight" text="Topic contents" justifyH="LEFT">
+					<Size><AbsDimension x="123" y="17" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"><Offset><AbsDimension x="272" y="-95" /></Offset></Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHeader" inherits="GameFontHighlight" text="" justifyH="LEFT">
+					<Size><AbsDimension x="451" y="17" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"><Offset><AbsDimension x="14" y="-250" /></Offset></Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentAvatar">
+					<Size><AbsDimension x="45" y="45"/></Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="8" y="8" /></Offset></Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<!-- The window closer -->
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors><Anchor point="CENTER" relativePoint="TOPRIGHT"><Offset><AbsDimension x="-11" y="-11"/></Offset></Anchor></Anchors>
+				<Scripts><OnClick>this:GetParent():Hide();</OnClick></Scripts>
+			</Button>
+			<!-- Note from the management -->
+			<Button name="$parentEditManagementNote" inherits="MessageBoard_LinkTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT"><Offset><AbsDimension x="482" y="-34"/></Offset></Anchor>
+				</Anchors>
+				<NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-SortArrow">
+					<Size><AbsDimension x="30" y="15"/></Size>
+					<Anchors><Anchor point="LEFT"><Offset><AbsDimension x="0" y="-1"/></Offset></Anchor></Anchors>
+				</NormalTexture>
+				<PushedTexture name="$parentNormalTexture" file="Interface\Buttons\UI-SortArrow">
+					<Size><AbsDimension x="30" y="15"/></Size>
+					<Anchors><Anchor point="LEFT"><Offset><AbsDimension x="0" y="-1"/></Offset></Anchor></Anchors>
+				</PushedTexture>
+				<Scripts>
+					<OnLoad>this:RegisterForClicks("LeftButtonDown");this.Help=MessageBoardLANG.Help.EditManagementNote;</OnLoad>
+					<OnClick>MessageBoardXML:EditManagementNote();</OnClick>
+					<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>
+			</Button>
+			<!-- Topic slider -->
+			<Frame name="$parent_TopicScroller">
+				<!-- 19+174+52=245 -->
+				<Size><AbsDimension x="245" y="109"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="11" y="-125" /></Offset></Anchor>
+				</Anchors>
+				<Frames>
+					<Slider name="$parent_Scroll" inherits="MessageBoard_SliderTemplate">
+						<Size><AbsDimension x="10" /></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"></Anchor>
+							<Anchor point="BOTTOMLEFT"></Anchor>
+						</Anchors>
+					</Slider>
+					<!-- Topic handlers -->
+					<CheckButton name="$parent_Entry1" inherits="MessageBoard_TopicSelectorButtonTemplate" text="Topic 1">
+						<Anchors>
+							<Anchor point="TOPLEFT"><Offset><AbsDimension x="19" /></Offset></Anchor>
+							<Anchor point="RIGHT"><Offset><AbsDimension x="-52" /></Offset></Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Entry2" inherits="MessageBoard_TopicSelectorButtonTemplate" text="Topic 2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent_Entry1" relativePoint="BOTTOMLEFT"><Offset><AbsDimension y="-5" /></Offset></Anchor>
+							<Anchor point="RIGHT" relativeTo="$parent_Entry1" relativePoint="RIGHT" />
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Entry3" inherits="MessageBoard_TopicSelectorButtonTemplate" text="Topic 3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent_Entry2" relativePoint="BOTTOMLEFT"><Offset><AbsDimension y="-5" /></Offset></Anchor>
+							<Anchor point="RIGHT" relativeTo="$parent_Entry2" relativePoint="RIGHT" />
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Entry4" inherits="MessageBoard_TopicSelectorButtonTemplate" text="Topic 4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent_Entry3" relativePoint="BOTTOMLEFT"><Offset><AbsDimension y="-5" /></Offset></Anchor>
+							<Anchor point="RIGHT" relativeTo="$parent_Entry3" relativePoint="RIGHT" />
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Entry5" inherits="MessageBoard_TopicSelectorButtonTemplate" text="Topic 5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent_Entry4" relativePoint="BOTTOMLEFT"><Offset><AbsDimension y="-5" /></Offset></Anchor>
+							<Anchor point="RIGHT" relativeTo="$parent_Entry4" relativePoint="RIGHT" />
+						</Anchors>
+					</CheckButton>
+				</Frames>
+				<Scripts>
+					<OnLoad>this.Entries=1;</OnLoad>
+					<OnMouseWheel>MessageBoardXML:MouseWheel(_G[this:GetName().."_Scroll"]);</OnMouseWheel>
+				</Scripts>
+			</Frame>
+			<!-- Author slider -->
+			<Frame name="$parent_AuthorScroller">
+				<Size><AbsDimension x="214" y="109"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="269" y="-125" /></Offset></Anchor>
+				</Anchors>
+				<Frames>
+					<Slider name="$parent_Scroll" inherits="MessageBoard_SliderTemplate">
+						<Size><AbsDimension x="10" /></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"></Anchor>
+							<Anchor point="BOTTOMLEFT"></Anchor>
+						</Anchors>
+					</Slider>
+					<!-- Author handlers -->
+					<CheckButton name="$parent_Entry1" inherits="MessageBoard_SelectorButtonTemplate" text="Author 1">
+						<Anchors>
+							<Anchor point="TOPLEFT"><Offset><AbsDimension x="19" /></Offset></Anchor>
+							<Anchor point="RIGHT" />
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Entry2" inherits="MessageBoard_SelectorButtonTemplate" text="Author 2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent_Entry1" relativePoint="BOTTOMLEFT"><Offset><AbsDimension y="-5" /></Offset></Anchor>
+							<Anchor point="RIGHT" relativeTo="$parent_Entry1" relativePoint="RIGHT" />
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Entry3" inherits="MessageBoard_SelectorButtonTemplate" text="Author 3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent_Entry2" relativePoint="BOTTOMLEFT"><Offset><AbsDimension y="-5" /></Offset></Anchor>
+							<Anchor point="RIGHT" relativeTo="$parent_Entry2" relativePoint="RIGHT" />
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Entry4" inherits="MessageBoard_SelectorButtonTemplate" text="Author 4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent_Entry3" relativePoint="BOTTOMLEFT"><Offset><AbsDimension y="-5" /></Offset></Anchor>
+							<Anchor point="RIGHT" relativeTo="$parent_Entry3" relativePoint="RIGHT" />
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Entry5" inherits="MessageBoard_SelectorButtonTemplate" text="Author 5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent_Entry4" relativePoint="BOTTOMLEFT"><Offset><AbsDimension y="-5" /></Offset></Anchor>
+							<Anchor point="RIGHT" relativeTo="$parent_Entry4" relativePoint="RIGHT" />
+						</Anchors>
+					</CheckButton>
+				</Frames>
+				<Scripts>
+					<OnLoad>this.Entries=1;</OnLoad>
+					<OnMouseWheel>MessageBoardXML:MouseWheel(_G[this:GetName().."_Scroll"]);</OnMouseWheel>
+				</Scripts>
+			</Frame>
+			<!-- New topic button -->
+			<Button name="$parentNewTopic" inherits="UIPanelButtonTemplate2" text="New topic">
+				<Size><AbsDimension x="100" y="22"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="153" y="-97"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>MessageBoardXML:MakeNewTopic();</OnClick>
+					<OnLoad>this.Help=MessageBoardLANG.Help.NewTopic;this:SetText(MessageBoardLANG.Widget.NewTopic);</OnLoad>
+					<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>
+			</Button>
+			<!-- Messagebox -->
+			<ScrollFrame name="$parentMB" inherits="UIPanelScrollFrameTemplate">
+				<Size><AbsDimension x="432" y="150"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="30" y="-278"/></Offset></Anchor>
+				</Anchors>
+				<ScrollChild>
+					<SimpleHTML name="$parentScrollText">
+						<Size><AbsDimension x="432" y="1800"/></Size>
+						<Anchors><Anchor point="TOPLEFT"/></Anchors>
+						<FontString inherits="GameFontHighlight" justifyH="LEFT" justifyV="TOP"/>
+						<Scripts>
+							<OnHyperlinkClick>
+								MessageBoardXML:OnHyperlinkShow(arg1,arg2,arg3);
+							</OnHyperlinkClick>
+						</Scripts>
+					</SimpleHTML>
+				</ScrollChild>
+			</ScrollFrame>
+			<!-- Reply-button -->
+			<Button name="$parentMsgReply" inherits="UIPanelButtonTemplate2" text="Reply">
+				<Size><AbsDimension x="100" y="22"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="85" y="-433"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>MessageBoardXML:Reply();</OnClick>
+					<OnLoad>this.Help=MessageBoardLANG.Help.Reply;this:SetText(MessageBoardLANG.Widget.Reply);</OnLoad>
+					<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>
+			</Button>
+			<!-- Edit-button -->
+			<Button name="$parentMsgEdit" inherits="UIPanelButtonTemplate2" text="Edit">
+				<Size><AbsDimension x="100" y="22"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="212" y="-433"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>MessageBoardXML:Edit();</OnClick>
+					<OnLoad>this.Help=MessageBoardLANG.Help.Edit;this:SetText(MessageBoardLANG.Widget.Edit);</OnLoad>
+					<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>
+			</Button>
+			<!-- Delete-button -->
+			<Button name="$parentMsgDelete" inherits="UIPanelButtonTemplate2" text="Delete">
+				<Size><AbsDimension x="100" y="22"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="340" y="-433"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>MessageBoardXML:DeleteMessage()</OnClick>
+					<OnLoad>this.Help=MessageBoardLANG.Help.Delete;this:SetText(MessageBoardLANG.Widget.Delete);</OnLoad>
+					<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>
+			</Button>
+			<!-- Options -->
+			<Button name="$parentOptions" inherits="UIPanelButtonTemplate2" text="Options">
+				<Size><AbsDimension x="102" y="22"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT"><Offset><AbsDimension x="-25" y="6"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>MessageBoard_OFrame:Show();</OnClick>
+					<OnLoad>this.Help=MessageBoardLANG.Help.Options;this:SetText(MessageBoardLANG.Widget.Options);</OnLoad>
+					<OnEnter>MessageBoardXML:Button_OnEnter();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>MessageBoardXML:Main_OnShow();</OnShow>
+			<OnUpdate>MessageBoardXML:Main_OnUpdate();</OnUpdate>
+			<OnHide>MessageBoardXML:Main_OnHide();</OnHide>
+			<OnLoad>MessageBoardXML:OnLoad();</OnLoad>
+			<OnEvent>MessageBoardXML:OnEvent(event);</OnEvent>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MessageBoard_HeartbeatFrame" visible="false">
+		<Scripts>
+			<OnUpdate>
+				MessageBoardXML:HeartBeat(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+</Ui>

@@ -1,0 +1,135 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Script file="TextEditor.lua"/>
+	<CheckButton name="MessageBoard_CheckButtonTemplate" inherits="UICheckButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>MessageBoardXML.Editor:CheckClick();</OnClick>
+		</Scripts>
+	</CheckButton>
+
+	<Frame name="MessageBoard_Editor" frameStrata="HIGH" toplevel="true" movable="true" enableMouse="true" hidden="true" parent="MessageBoard_Main">
+		<Size><AbsDimension x="491" y="322"/></Size>
+		<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="30" y="30"/></Offset></Anchor></Anchors>
+		<Backdrop bgFile="Interface\AddOns\MessageBoard\Images\MessageBoardEditBG">
+			<BackgroundInsets><AbsInset left="0" right="-21" top="0" bottom="-190"/></BackgroundInsets>
+		</Backdrop>
+		<TitleRegion setAllPoints="true"/>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTopicLabel" inherits="GameFontHighlight" text="Topic:" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT"><Offset><AbsDimension x="14" y="-13" /></Offset></Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentMessageLabel" inherits="GameFontHighlight" text="Message:" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT"><Offset><AbsDimension x="14" y="-75" /></Offset></Anchor>
+					</Anchors>
+				</FontString>
+          </Layer>
+		</Layers>
+
+		<Frames>
+			<!-- The window closer -->
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOPRIGHT"><Offset><AbsDimension x="-11" y="-11"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>this:GetParent():Hide();</OnClick>
+				</Scripts>
+			</Button>
+			<!-- Topic name -->
+			<EditBox name="$parentTopicName" enableMouse="true" autoFocus="false">
+				<Size><AbsDimension x="250" y="22" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="31" y="-36"/></Offset></Anchor></Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size><AbsDimension x="8" y="20" /></Size>
+							<Anchors><Anchor point="LEFT"/></Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625" />
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size><AbsDimension x="8" y="20"/></Size>
+							<Anchors><Anchor point="RIGHT"/></Anchors>
+							<TexCoords left="0.9375" right="1" top="0" bottom="0.625" />
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size><AbsDimension x="10" y="20"/></Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT" />
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625" />
+						</Texture>
+					</Layer>
+				</Layers>
+				<FontString inherits="GameFontNormal" justifyH="LEFT"/>
+				<Scripts>
+					<OnLoad>this:SetTextInsets(3,2,0,0);</OnLoad>
+					<OnEscapePressed>this:ClearFocus();</OnEscapePressed>
+				</Scripts>
+			</EditBox>
+			<!-- Make announcement -->
+			<CheckButton name="$parent_Announce" inherits="MessageBoard_CheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP"><Offset><AbsDimension y="-6"/></Offset></Anchor>
+					<Anchor point="LEFT" relativeTo="$parentTopicName" relativePoint="RIGHT"><Offset><AbsDimension x="15"/></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>_G[this:GetName().."Text"]:SetText(MessageBoardLANG.Widget.Announcement);</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<!-- Make sticky -->
+			<CheckButton name="$parent_Sticky" inherits="MessageBoard_CheckButtonTemplate">
+				<Anchors><Anchor point="TOPLEFT" relativeTo="$parent_Announce" relativePoint="BOTTOMLEFT"><Offset><AbsDimension y="7"/></Offset></Anchor></Anchors>
+				<Scripts>
+					<OnLoad>_G[this:GetName().."Text"]:SetText(MessageBoardLANG.Widget.Sticky);</OnLoad>
+				</Scripts>
+			</CheckButton>
+
+			<ScrollFrame name="$parentSB" inherits="UIPanelScrollFrameTemplate">
+				<Size><AbsDimension x="432" y="150"/></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="30" y="-98" /></Offset></Anchor></Anchors>
+				<ScrollChild>
+					<EditBox name="$parentEdit" enableMouse="true" multiLine="true">
+						<Size><AbsDimension x="432" y="150" /></Size>
+						<FontString inherits="GameFontNormal" justifyH="LEFT"/>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture>
+									<Anchors><Anchor point="TOPLEFT"/><Anchor point="BOTTOMRIGHT"/></Anchors>
+									<Color r="1" g="1" b="1" a="0.08"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnReceiveDrag>MessageBoardXML.Editor:ItemDrop(true);</OnReceiveDrag>
+							<OnClick>MessageBoardXML.Editor:ItemDrop(true);</OnClick>
+						</Scripts>
+					</EditBox>
+				</ScrollChild>
+			</ScrollFrame>
+			<Button name="$parentSave" inherits="UIPanelButtonTemplate2" text="Save">
+				<Size><AbsDimension x="100" y="22"/></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="43" y="-270"/></Offset></Anchor></Anchors>
+				<Scripts>
+					<OnLoad>this:SetText(MessageBoardLANG.Widget.Save);</OnLoad>
+					<OnClick>MessageBoardXML.Editor:Save();</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentDiscard" inherits="UIPanelButtonTemplate2" text="Discard">
+				<Size><AbsDimension x="100" y="22"/></Size>
+				<Anchors><Anchor point="TOPRIGHT"><Offset><AbsDimension x="-43" y="-270"/></Offset></Anchor></Anchors>
+				<Scripts>
+					<OnLoad>this:SetText(MessageBoardLANG.Widget.Discard);</OnLoad>
+					<OnClick>MessageBoardXML.Editor:Discard();</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>MessageBoardXML.Editor:OnLoad();</OnLoad>
+		</Scripts>
+	</Frame>
+</Ui>
